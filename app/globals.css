@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Zendapp theme tokens.
+  Derived entirely from the brand triad: #31028f (violet), #000000, #FFFFFF.
+  Light and dark are both tinted with the brand violet rather than neutral
+  gray, so the product never feels like a generic dashboard.
+*/
+
+@layer base {
+  :root {
+    --background: 260 45% 99%;
+    --foreground: 262 45% 8%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 262 45% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 262 45% 8%;
+
+    --surface: 260 40% 98%;
+    --surface-raised: 0 0% 100%;
+    --surface-sunken: 258 35% 95%;
+
+    --primary: 264 96% 29%;
+    --primary-foreground: 0 0% 100%;
+
+    --muted: 260 25% 94%;
+    --muted-foreground: 260 12% 42%;
+
+    --accent: 264 96% 96%;
+    --accent-foreground: 264 96% 22%;
+
+    --destructive: 4 78% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 260 20% 90%;
+    --input: 260 20% 88%;
+    --ring: 264 96% 29%;
+
+    --radius: 1rem;
+
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Inter Display", "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+
+  .dark {
+    --background: 262 45% 5%;
+    --foreground: 260 30% 96%;
+
+    --card: 263 40% 8%;
+    --card-foreground: 260 30% 96%;
+
+    --popover: 263 40% 8%;
+    --popover-foreground: 260 30% 96%;
+
+    --surface: 262 40% 7%;
+    --surface-raised: 263 35% 10%;
+    --surface-sunken: 262 45% 4%;
+
+    --primary: 264 90% 68%;
+    --primary-foreground: 264 60% 10%;
+
+    --muted: 263 25% 14%;
+    --muted-foreground: 260 15% 65%;
+
+    --accent: 264 55% 18%;
+    --accent-foreground: 264 90% 88%;
+
+    --destructive: 4 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 263 25% 16%;
+    --input: 263 25% 18%;
+    --ring: 264 90% 68%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  ::selection {
+    @apply bg-primary/20;
+  }
+}
+
+@layer utilities {
+  .skeleton {
+    @apply relative overflow-hidden bg-muted;
+    background-image: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0px,
+      hsl(var(--surface-raised)) 40px,
+      hsl(var(--muted)) 80px
+    );
+    background-size: 700px 100%;
+    animation: shimmer 1.8s infinite linear;
+  }
+  .glass {
+    @apply bg-white/10 backdrop-blur-xl backdrop-saturate-150 border border-white/15;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
