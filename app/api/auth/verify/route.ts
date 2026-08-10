@@ -33,9 +33,20 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Create a pending user shell — no wallet or username yet.
+  // If this email already has a completed account, this is a sign-in on
+  // (possibly) a new device — activate the real session immediately and
+  // hand back the user record so the client can check whether this
+  // device already has the matching wallet locally, or needs to restore
+  // it from the recovery phrase (see /restore-wallet).
+  const existing = await db.getUserByEmail(parsed.data.email);
+  if (existing) {
+    await createSession({ sub: existing.id, email: parsed.data.email, stage: "active" });
+    return NextResponse.json({ ok: true, existingAccount: true, user: existing });
+  }
+
+  // Otherwise this is a new signup — create a pending session with no
+  // wallet or username yet; the normal onboarding flow picks up from here.
   const id = randomUUID();
   await createSession({ sub: id, email: parsed.data.email, stage: "pending" });
-
-  return NextResponse.json({ ok: true, userId: id });
+  return NextResponse.json({ ok: true, existingAccount: false });
 }

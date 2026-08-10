@@ -25,14 +25,13 @@ export async function POST(req: NextRequest) {
   }
 
   const existing = await db.getUserByEmail(parsed.data.email);
-  if (existing) {
-    return NextResponse.json(
-      { error: { code: "EMAIL_TAKEN", message: "An account with this email already exists." } },
-      { status: 409 },
-    );
-  }
 
+  // Same entry point serves both "create an account" and "sign in on a new
+  // device": either way, we send a code to prove the person controls this
+  // inbox, then branch after verification based on whether an account
+  // already exists. There's no separate "log in" button anywhere in the
+  // UI — one email field handles both cases, like most modern apps do.
   const code = await db.createVerificationCode(parsed.data.email);
   await sendVerificationEmail(parsed.data.email, code);
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, accountExists: !!existing });
 }

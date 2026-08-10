@@ -1,3 +1,5 @@
+import type { ZendUser } from "@/types";
+
 export class ApiRequestError extends Error {
   code: string;
   status: number;
@@ -28,9 +30,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  signup: (email: string) => request<{ ok: true }>("/api/auth/signup", { method: "POST", body: JSON.stringify({ email }) }),
+  signup: (email: string) =>
+    request<{ ok: true; accountExists: boolean }>("/api/auth/signup", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
   verify: (email: string, code: string) =>
-    request<{ ok: true; userId: string }>("/api/auth/verify", { method: "POST", body: JSON.stringify({ email, code }) }),
+    request<{ ok: true; existingAccount: boolean; user?: ZendUser }>("/api/auth/verify", {
+      method: "POST",
+      body: JSON.stringify({ email, code }),
+    }),
   checkUsername: (u: string) => request<{ available: boolean; error?: string; normalized?: string }>(`/api/username/check?u=${encodeURIComponent(u)}`),
   completeOnboarding: (payload: { walletAddress: string; username: string; displayName: string }) =>
     request<{ user: any }>("/api/users/complete", { method: "POST", body: JSON.stringify(payload) }),

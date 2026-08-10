@@ -42,6 +42,32 @@ export function createWallet(): GeneratedWallet {
   return { mnemonic, address: account.address, account };
 }
 
+const ENGLISH_WORDLIST = new Set(english);
+
+/**
+ * Validates a user-entered recovery phrase (word count + every word is a
+ * real BIP-39 word + a valid checksum) and returns the address it derives
+ * to, or null if it's not a usable phrase at all. Used by the
+ * device-restore flow to give a precise "that's not a valid recovery
+ * phrase" error before even trying to compare it against an account.
+ */
+export function deriveAddressFromMnemonic(phrase: string): `0x${string}` | null {
+  const words = phrase
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (words.length !== 12 && words.length !== 24) return null;
+  if (!words.every((w) => ENGLISH_WORDLIST.has(w))) return null;
+
+  try {
+    return mnemonicToAccount(words.join(" ")).address;
+  } catch {
+    return null;
+  }
+}
+
 const PBKDF2_ITERATIONS = 210_000;
 
 async function deriveKey(passphrase: string, salt: Uint8Array): Promise<CryptoKey> {

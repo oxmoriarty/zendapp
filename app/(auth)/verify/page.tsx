@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { api, ApiRequestError } from "@/lib/api-client";
 import { useSessionStore } from "@/store/session-store";
+import { getStoredWalletAddress } from "@/lib/wallet/wallet";
 import { cn } from "@/lib/utils";
 
 export default function VerifyPage() {
   const router = useRouter();
-  const { pendingEmail, setOnboardingStep } = useSessionStore();
+  const { pendingEmail, setOnboardingStep, setUser, setPendingRestoreUser } = useSessionStore();
   const [digits, setDigits] = useState<string[]>(Array(6).fill(""));
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -38,7 +39,30 @@ export default function VerifyPage() {
     setError(null);
     setLoading(true);
     try {
-      await api.verify(pendingEmail, code);
+      const res = await api.verify(pendingEmail, code);
+
+      if (res.existingAccount && res.user) {
+        // Signing in to an existing account — possibly on a brand-new
+        // device. The account itself (username, email, wallet address) is
+        // verified server-side; whether *this device* can actually sign
+        // payments depends on whether it already holds the matching
+        // encrypted wallet locally.
+        const localAddress = await getStoredWalletAddress();
+        const matches = !!localAddress && localAddress.toLowerCase() === res.user.walletAddress.toLowerCase();
+
+        if (matches) {
+          setUser(res.user);
+          router.push("/home");
+        } else {
+          // New device (or a mismatched local wallet) — this device needs
+          // the recovery phrase before it can send anything.
+          setPendingRestoreUser(res.user);
+          router.push("/restore-wallet");
+        }
+        return;
+      }
+
+      // Brand-new account — continue the normal onboarding flow.
       setOnboardingStep("wallet");
       router.push("/wallet");
     } catch (err) {

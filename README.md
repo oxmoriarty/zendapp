@@ -164,10 +164,9 @@ npx web-push generate-vapid-keys
 ```
 Set the three values it prints:
 ```
-VAPID_PUBLIC_KEY=
-VAPID_PRIVATE_KEY=
-NEXT_PUBLIC_VAPID_PUBLIC_KEY=  
-# same as VAPID_PUBLIC_KEY, exposed to the client
+VAPID_PUBLIC_KEY=...
+VAPID_PRIVATE_KEY=...
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=...   # same as VAPID_PUBLIC_KEY, exposed to the client
 VAPID_SUBJECT="mailto:support@yourdomain.com"
 ```
 
