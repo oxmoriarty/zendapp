@@ -72,7 +72,13 @@ export const db = {
     return !!existing;
   },
 
-  async createUser(input: { email: string; username: string; displayName: string; walletAddress: string }) {
+  async createUser(input: {
+    email: string;
+    username: string;
+    displayName: string;
+    walletAddress: string;
+    avatarUrl?: string;
+  }) {
     const [row] = await client
       .insert(users)
       .values({
@@ -80,10 +86,21 @@ export const db = {
         username: input.username.toLowerCase(),
         displayName: input.displayName,
         walletAddress: input.walletAddress,
+        avatarUrl: input.avatarUrl,
         emailVerified: 1,
       })
       .returning();
     return toZendUser(row);
+  },
+
+  async updateUserAvatar(userId: string, avatarUrl: string) {
+    const [row] = await client.update(users).set({ avatarUrl }).where(eq(users.id, userId)).returning();
+    return row ? toZendUser(row) : null;
+  },
+
+  async getUserById(id: string) {
+    const [u] = await client.select().from(users).where(eq(users.id, id));
+    return u ? toZendUser(u) : null;
   },
 
   async getUserByEmail(email: string) {

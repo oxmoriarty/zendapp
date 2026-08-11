@@ -1,31 +1,34 @@
-"use client";
+import type { Metadata } from "next";
+import { AuthRedirectGate } from "@/components/landing/auth-redirect-gate";
+import { LandingNav } from "@/components/landing/landing-nav";
+import { Hero } from "@/components/landing/hero";
+import { TrustStrip } from "@/components/landing/trust-strip";
+import { FeaturesSection } from "@/components/landing/features-section";
+import { HowItWorksSection } from "@/components/landing/how-it-works-section";
+import { SecuritySection } from "@/components/landing/security-section";
+import { FinalCta } from "@/components/landing/final-cta";
+import { Footer } from "@/components/landing/footer";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSessionStore } from "@/store/session-store";
-import { Logo } from "@/components/logo";
+export const metadata: Metadata = {
+  title: "Zendapp — Send money like a text",
+  description:
+    "Pay anyone by username, in USDC, settled instantly on Arc. Non-custodial — Zendapp never holds your funds or your keys.",
+};
 
-export default function RootGate() {
-  const router = useRouter();
-  const { isAuthenticated, onboardingStep } = useSessionStore();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace("/home");
-      return;
-    }
-    if (onboardingStep && onboardingStep !== "signup" && onboardingStep !== "done") {
-      router.replace(`/${onboardingStep}`);
-      return;
-    }
-    router.replace("/signup");
-  }, [isAuthenticated, onboardingStep, router]);
-
+export default function LandingPage() {
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-zen-radial">
-      <div className="animate-fade-in">
-        <Logo size={36} className="scale-125" />
-      </div>
+    <div className="min-h-dvh bg-background">
+      <AuthRedirectGate />
+      <LandingNav />
+      <main>
+        <Hero />
+        <TrustStrip />
+        <FeaturesSection />
+        <HowItWorksSection />
+        <SecuritySection />
+        <FinalCta />
+      </main>
+      <Footer />
     </div>
   );
 }

@@ -41,10 +41,13 @@ export const api = {
       body: JSON.stringify({ email, code }),
     }),
   checkUsername: (u: string) => request<{ available: boolean; error?: string; normalized?: string }>(`/api/username/check?u=${encodeURIComponent(u)}`),
-  completeOnboarding: (payload: { walletAddress: string; username: string; displayName: string }) =>
+  completeOnboarding: (payload: { walletAddress: string; username: string; displayName: string; avatarImage?: string }) =>
     request<{ user: any }>("/api/users/complete", { method: "POST", body: JSON.stringify(payload) }),
   me: () => request<{ user: any }>("/api/users/me"),
   searchUsers: (q: string) => request<{ users: any[] }>(`/api/users/search?q=${encodeURIComponent(q)}`),
+  getUserByUsername: (username: string) => request<{ user: any }>(`/api/users/${encodeURIComponent(username)}`),
+  uploadAvatar: (dataUri: string) =>
+    request<{ user: any }>("/api/users/avatar", { method: "POST", body: JSON.stringify({ image: dataUri }) }),
   recordTx: (payload: {
     hash?: string;
     toAddress: string;

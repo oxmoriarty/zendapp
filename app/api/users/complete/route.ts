@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { isAddress } from "viem";
+import { randomUUID } from "crypto";
 import { getSession, createSession } from "@/lib/auth/session";
 import { validateUsername } from "@/lib/validations/username";
 import { db } from "@/lib/server/db";
+import { storeAvatarImage, AvatarStorageError } from "@/lib/server/avatar-storage";
 
 const schema = z.object({
   walletAddress: z.string().refine((v) => isAddress(v), "Invalid wallet address"),
   username: z.string(),
   displayName: z.string().trim().min(1).max(40),
+  // A compressed data: URI produced client-side (lib/image/compress.ts).
+  // Optional — most people skip a photo during onboarding and add one later.
+  avatarImage: z.string().startsWith("data:image/").max(4_000_000).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -53,6 +58,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  let avatarUrl: string | undefined;
+  if (parsed.data.avatarImage) {
+    try {
+      // The user row doesn't exist yet, so a fresh id is generated up front
+      // purely to namespace the stored file — Postgres still assigns the
+      // row's real primary key on insert below.
+      avatarUrl = await storeAvatarImage(parsed.data.avatarImage, randomUUID());
+    } catch (err) {
+      const message = err instanceof AvatarStorageError ? err.message : "Couldn't process that photo.";
+      return NextResponse.json({ error: { code: "INVALID_INPUT", message } }, { status: 400 });
+    }
+  }
+
   let user;
   try {
     user = await db.createUser({
@@ -60,6 +78,7 @@ export async function POST(req: NextRequest) {
       username: usernameResult.normalized,
       displayName: parsed.data.displayName,
       walletAddress: parsed.data.walletAddress,
+      avatarUrl,
     });
   } catch {
     // Most likely a unique-constraint race (two requests claiming the same

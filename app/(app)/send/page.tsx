@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Search, X, AlertTriangle, Check, Lock, Fingerprint } from "lucide-react";
+import { ArrowLeft, Search, X, AlertTriangle, Check, Lock, Fingerprint, QrCode } from "lucide-react";
+import { QrScanner } from "@/components/qr-scanner";
+import { parseZendappQrPayload } from "@/lib/qr/parse";
 import { Avatar } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -42,10 +44,42 @@ export default function SendPage() {
   const [biometricTrying, setBiometricTrying] = useState(false);
   const [flowError, setFlowError] = useState<{ title: string; message: string } | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [scanError, setScanError] = useState<string | null>(null);
+  const [resolvingScan, setResolvingScan] = useState(false);
 
   function pickRecipient(u: ZendUser) {
     setRecipient(u);
     setStep("amount");
+  }
+
+  async function handleScannedCode(text: string) {
+    setScannerOpen(false);
+    setScanError(null);
+
+    const username = parseZendappQrPayload(text);
+    if (!username) {
+      setScanError("That doesn't look like a Zendapp QR code.");
+      return;
+    }
+    if (user && username === user.username) {
+      setScanError("That's your own QR code — try scanning a friend's instead.");
+      return;
+    }
+
+    setResolvingScan(true);
+    try {
+      const { user: scannedUser } = await api.getUserByUsername(username);
+      pickRecipient(scannedUser);
+    } catch (err) {
+      setScanError(
+        err instanceof ApiRequestError && err.code === "USER_NOT_FOUND"
+          ? `No Zendapp account found for @${username}.`
+          : "Couldn't look up that code. Please try again.",
+      );
+    } finally {
+      setResolvingScan(false);
+    }
   }
 
   async function proceedToReview() {
@@ -214,24 +248,40 @@ export default function SendPage() {
       <AnimatePresence mode="wait">
         {step === "search" && (
           <motion.div key="search" {...fade}>
-            <div className="relative mb-4">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search by username"
-                className="pl-11 pr-10"
-                autoFocus
-              />
-              {query && (
-                <button
-                  onClick={() => setQuery("")}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
+            <div className="mb-4 flex gap-2">
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search by username"
+                  className="pl-11 pr-10"
+                  autoFocus
+                />
+                {query && (
+                  <button
+                    onClick={() => setQuery("")}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              <button
+                onClick={() => {
+                  setScanError(null);
+                  setScannerOpen(true);
+                }}
+                disabled={resolvingScan}
+                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-input bg-surface-raised text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                aria-label="Scan a QR code"
+              >
+                <QrCode className="h-5 w-5" />
+              </button>
             </div>
+
+            {resolvingScan && <p className="mb-3 px-3 text-sm text-muted-foreground">Looking up that code…</p>}
+            {scanError && <p className="mb-3 px-3 text-sm text-destructive">{scanError}</p>}
 
             {status === "loading" && (
               <div className="space-y-2">
@@ -448,6 +498,8 @@ export default function SendPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <QrScanner open={scannerOpen} onClose={() => setScannerOpen(false)} onDecode={handleScannedCode} />
     </div>
   );
 }

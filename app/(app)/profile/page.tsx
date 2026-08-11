@@ -1,16 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useRef } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { Share2, Settings, Camera } from "lucide-react";
+import { Share2, Settings, Camera, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useSessionStore } from "@/store/session-store";
+import { useAvatarUpload } from "@/hooks/use-avatar-upload";
 
 export default function ProfilePage() {
   const user = useSessionStore((s) => s.user);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { preview, uploading, error, selectFile, upload } = useAvatarUpload();
+
   if (!user) return null;
 
   const joined = new Date(user.createdAt).toLocaleDateString("en-US", {
@@ -18,6 +22,11 @@ export default function ProfilePage() {
     year: "numeric",
   });
   const shareUrl = `https://zendapp.app/${user.username}`;
+
+  async function handlePhotoPicked(file: File) {
+    await selectFile(file);
+    await upload();
+  }
 
   return (
     <div className="mx-auto max-w-md">
@@ -29,12 +38,29 @@ export default function ProfilePage() {
       </header>
 
       <div className="flex flex-col items-center">
-        <button className="group relative">
-          <Avatar name={user.displayName} src={user.avatarUrl} size={96} />
+        <button
+          className="group relative"
+          onClick={() => fileInputRef.current?.click()}
+          aria-label="Change profile photo"
+        >
+          <Avatar name={user.displayName} src={preview ?? user.avatarUrl} size={96} />
           <span className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-soft transition-transform group-hover:scale-105">
-            <Camera className="h-4 w-4" />
+            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
           </span>
         </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="user"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) void handlePhotoPicked(file);
+            e.target.value = "";
+          }}
+        />
+        {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
         <h2 className="mt-4 font-display text-xl font-semibold">{user.displayName}</h2>
         <p className="text-muted-foreground">@{user.username}</p>
       </div>

@@ -24,6 +24,7 @@ interface SessionState {
   setPendingRestoreUser: (user: ZendUser | null) => void;
   setOnboardingStep: (step: SessionState["onboardingStep"]) => void;
   setUser: (user: ZendUser) => void;
+  updateAvatarUrl: (avatarUrl: string) => void;
   logout: () => void;
 }
 
@@ -39,6 +40,8 @@ export const useSessionStore = create<SessionState>()(
       setPendingRestoreUser: (user) => set({ pendingRestoreUser: user }),
       setOnboardingStep: (step) => set({ onboardingStep: step }),
       setUser: (user) => set({ user, isAuthenticated: true, onboardingStep: "done", pendingRestoreUser: null }),
+      updateAvatarUrl: (avatarUrl) =>
+        set((s) => (s.user ? { user: { ...s.user, avatarUrl } } : s)),
       logout: () =>
         set({
           user: null,

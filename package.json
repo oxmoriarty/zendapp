@@ -21,11 +21,13 @@
     "@radix-ui/react-tabs": "1.1.0",
     "@radix-ui/react-toast": "1.2.1",
     "@tanstack/react-query": "5.51.24",
+    "@vercel/blob": "^2.8.0",
     "class-variance-authority": "0.7.0",
     "clsx": "2.1.1",
     "drizzle-orm": "^0.45.2",
     "framer-motion": "11.3.24",
     "jose": "5.6.3",
+    "jsqr": "^1.4.0",
     "lucide-react": "0.428.0",
     "next": "^14.2.35",
     "next-themes": "0.3.0",
@@ -54,5 +56,15 @@
     "postcss": "8.4.40",
     "tailwindcss": "3.4.7",
     "tailwindcss-animate": "1.0.7"
+  },
+  "allowScripts": {
+    "esbuild@0.18.20": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.28.1": true,
+    "bufferutil@4.1.0": true,
+    "keccak@3.0.4": true,
+    "secp256k1@5.0.1": true,
+    "unrs-resolver@1.12.2": true,
+    "utf-8-validate@5.0.10": true
   }
 }

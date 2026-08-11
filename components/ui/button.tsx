@@ -48,8 +48,18 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || loading}
         {...props}
       >
-        {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
-        {children}
+        {asChild ? (
+          // Slot requires exactly one element child to clone props onto —
+          // asChild is for wrapping links/other components, so the loading
+          // spinner (a button-only affordance) is skipped in this branch
+          // rather than risking a second sibling child reaching Slot.
+          children
+        ) : (
+          <>
+            {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+            {children}
+          </>
+        )}
       </Comp>
     );
   },

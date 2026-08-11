@@ -19,6 +19,68 @@ commands and output.
 - **Resend** for transactional email, with a console-log dev fallback
 - **web-push** (VAPID) for browser push notifications
 - **WebAuthn (PRF extension)** for optional Face ID / Touch ID payment confirmation
+- **jsQR** for camera-based QR scanning (Send flow)
+- **@vercel/blob** for profile photo storage, with a real dev fallback when unconfigured
+
+## Public landing page
+
+`/` is a real marketing page (nav, hero, features, how-it-works, security,
+final CTA, footer) — not a redirect. `components/landing/` holds every
+section; `components/landing/auth-redirect-gate.tsx` preserves the original
+behavior of sending already-logged-in or mid-onboarding visitors straight
+to `/home` or wherever they left off, so only genuinely new visitors see
+the marketing content. `/terms` and `/privacy` are honest placeholder pages
+(no fabricated legal text) linked from the footer.
+
+## Sign in on any device
+
+The single email-entry screen (`/signup`) serves both new signups and
+returning sign-ins. After email verification, if the account already
+exists, the server activates a real session immediately; the client then
+checks whether *this device* already holds the matching encrypted wallet
+locally. If not (a new phone, a cleared browser), `/restore-wallet` walks
+through entering the recovery phrase — verified against the account's
+actual on-file wallet address before anything is stored — and setting a
+passcode for that device.
+
+## QR scanning
+
+Receive/Profile already generated a QR code encoding
+`https://zendapp.app/<username>`; the Send flow can now scan one back.
+`components/qr-scanner.tsx` is a full-screen camera view (no third-party
+scanning-UI library — just `getUserMedia` + a canvas frame grab loop)
+decoded with **jsQR**, chosen because it's a small (~9 KB), dependency-free,
+long-established pure-JS QR decoder — enough to own the camera plumbing
+directly rather than inherit a heavier library's UI. `lib/qr/parse.ts`
+turns the decoded text into a username (accepting the full URL, a bare
+`zendapp.app/<username>`, or a raw username), rejecting anything that
+isn't actually a Zendapp code — including a lookalike domain — rather than
+guessing. `GET /api/users/[username]` resolves the exact account
+afterward (distinct from the substring-matching `/api/users/search` used
+for type-ahead).
+
+Requires HTTPS or localhost, same as WebAuthn — browsers refuse camera
+access otherwise.
+
+## Profile photo upload
+
+The onboarding "add a photo" button and the Profile page's camera badge
+were both previously decorative. Both are wired up now:
+
+- `lib/image/compress.ts` resizes/center-crops/compresses the chosen photo
+  to a small square entirely client-side (plain Canvas API — no extra
+  dependency needed for something this size) before it's ever uploaded.
+- `lib/server/avatar-storage.ts` stores it via **Vercel Blob** when
+  `BLOB_READ_WRITE_TOKEN` is set (enabling the Blob store for a Vercel
+  project sets this automatically — nothing to copy-paste), or falls back
+  to storing the compressed image directly as a `data:` URI on the user
+  record otherwise, following the same "real code path either way, no
+  mock to swap out later" pattern already used for email and push.
+- During onboarding, the photo is included directly in the
+  `POST /api/users/complete` submission (the account doesn't exist yet to
+  attach a photo to beforehand); from the Profile page afterward, it's a
+  standalone `POST /api/users/avatar` call. Both funnel through the same
+  storage helper.
 
 ## Why Drizzle, not Prisma
 
@@ -239,6 +301,22 @@ a real browser/authenticator): live Resend email delivery, live push
 delivery to a real browser, and a real WebAuthn biometric prompt. All three
 are complete, real implementations; they need your credentials and a real
 browser session to see fire, per the guide above.
+
+**Added and tested in the same way for the landing page / QR / photo
+upload round:** the QR payload parser (`lib/qr/parse.ts`) against 12 cases
+including a lookalike-domain rejection; onboarding with a photo attached,
+end-to-end against real Postgres, confirming the `data:` URI dev-fallback
+path actually stores and round-trips through `/api/users/me`; the
+standalone `POST /api/users/avatar` change-photo flow the same way; the new
+exact-username lookup route (`/api/users/[username]`) for a real match, a
+404, and a malformed username; a regression pass on search (including
+confirming its self-exclusion behavior is by design, not a bug); a
+regression pass on `tx/record` + `tx/history` after touching the Send page;
+and every route (`/`, `/terms`, `/privacy`, `/signup`, `/send`, `/profile`)
+resolving correctly. Not testable from here: an actual camera scan (needs
+real hardware/browser) — the parsing and resolution logic it depends on is
+tested as above, and the camera-facing code itself is a small, standard
+`getUserMedia` + canvas loop with no novel logic in it.
 
 ## Error handling
 
