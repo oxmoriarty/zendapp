@@ -9,61 +9,63 @@ import { Avatar } from "@/components/ui/avatar";
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[640px] bg-zen-mesh opacity-70 dark:opacity-40" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[680px] bg-zen-mesh opacity-70 dark:opacity-40" />
 
-      <div className="mx-auto grid max-w-6xl items-center gap-16 px-6 pb-20 pt-16 md:grid-cols-2 md:pb-32 md:pt-24">
+      <div className="mx-auto grid max-w-6xl items-center gap-16 px-6 pb-24 pt-20 md:grid-cols-2 md:pb-36 md:pt-28">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface-raised px-3 py-1.5 text-xs font-medium text-muted-foreground">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            Built on Arc
-          </div>
-
-          <h1 className="font-display text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">
-            Send USDC to anyone —{" "}
+          <h1 className="font-display text-[2.75rem] font-semibold leading-[1.05] tracking-[-0.02em] text-foreground sm:text-6xl lg:text-[4.25rem]">
+            Send USDC to anyone.
+            <br />
             <span className="bg-zen-gradient bg-clip-text text-transparent">
-              using just their username.
+              All you need is their username.
             </span>
           </h1>
 
-          <p className="mt-6 max-w-md text-lg leading-relaxed text-muted-foreground">
+          <p className="mt-7 max-w-md text-lg leading-relaxed text-foreground/60">
             No wallet addresses. No gas fees to think about. No crypto jargon. Zendapp feels like
-            texting money to a friend — and it settles instantly.
+            texting money to a friend, and it settles instantly.
           </p>
 
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <Button asChild variant="glow" size="lg">
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <Button
+              asChild
+              variant="glow"
+              size="lg"
+              className="transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_-8px_rgba(49,2,143,0.55)]"
+            >
               <Link href="/signup">
-                Get started free <ArrowRight className="h-4 w-4" />
+                Get Started <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg">
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/5"
+            >
               <a href="#how-it-works">See how it works</a>
             </Button>
           </div>
-
-          <p className="mt-6 text-xs text-muted-foreground">
-            Free to sign up. No credit card, no wallet setup headaches.
-          </p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
-          className="relative mx-auto w-full max-w-sm"
+          className="group relative mx-auto w-full max-w-sm [perspective:1200px]"
         >
           <div className="pointer-events-none absolute -right-10 -top-14 h-56 w-56 rounded-full bg-primary-300/30 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-16 -left-10 h-48 w-48 rounded-full bg-primary-500/20 blur-3xl" />
 
-          {/* Balance card mockup — mirrors the real in-app card so the hero shows the actual product */}
+          {/* Balance card mockup - mirrors the real in-app card so the hero shows the actual product */}
           <motion.div
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="relative overflow-hidden rounded-3xl bg-zen-radial p-7 text-white shadow-glow"
+            className="relative overflow-hidden rounded-3xl bg-zen-radial p-7 text-white shadow-glow transition-transform duration-500 ease-out will-change-transform group-hover:[transform:rotateY(-6deg)_rotateX(3deg)]"
           >
             <p className="text-sm font-medium text-white/70">Your balance</p>
             <div className="mt-3 flex items-baseline gap-2">
@@ -80,7 +82,7 @@ export function Hero() {
             </div>
           </motion.div>
 
-          {/* Overlapping "payment sent" toast — shows the send flow's real end state */}
+          {/* Overlapping "payment sent" toast - shows the send flow's real end state */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9, x: -12 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}

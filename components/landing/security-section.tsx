@@ -7,8 +7,7 @@ const POINTS = [
   {
     icon: ShieldCheck,
     title: "Your keys never touch our servers",
-    description:
-      "Generated and AES-encrypted on your device. We only ever store your public wallet address — never a private key.",
+    description: "Generated and encrypted with AES on your device. We only ever store your public wallet address, never a private key.",
   },
   {
     icon: Fingerprint,
@@ -18,7 +17,7 @@ const POINTS = [
   {
     icon: Ban,
     title: "Arc's blocklist, enforced automatically",
-    description: "Every payment is screened at the protocol level before it settles — not after.",
+    description: "Every payment is screened at the protocol level before it settles, not after.",
   },
 ];
 
@@ -49,8 +48,9 @@ export function SecuritySection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
+              className="group"
             >
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-md">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-md transition-transform duration-300 group-hover:scale-110 group-hover:bg-white/15">
                 <Icon className="h-5 w-5" />
               </span>
               <h3 className="mt-5 font-display text-lg font-semibold">{title}</h3>

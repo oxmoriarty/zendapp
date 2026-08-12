@@ -19,11 +19,16 @@ export function FinalCta() {
           Your first payment is 60 seconds away.
         </h2>
         <p className="mt-4 max-w-md text-muted-foreground">
-          Sign up, pick a username, and start sending — free, and non-custodial from the first second.
+          Sign up, pick a username, and start sending. It&apos;s free, and you&apos;re always in control of your funds.
         </p>
-        <Button asChild variant="glow" size="lg" className="mt-8">
+        <Button
+          asChild
+          variant="glow"
+          size="lg"
+          className="mt-8 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_-8px_rgba(49,2,143,0.55)]"
+        >
           <Link href="/signup">
-            Get started free <ArrowRight className="h-4 w-4" />
+            Get Started <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
       </motion.div>

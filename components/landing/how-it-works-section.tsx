@@ -6,13 +6,12 @@ const STEPS = [
   {
     number: "01",
     title: "Create your wallet",
-    description:
-      "Sign up with your email. Zendapp generates a private, non-custodial wallet on your device in seconds — no seed-phrase apps, no browser extensions.",
+    description: "Sign up with your email. Zendapp creates a wallet only you control, right on your device, in seconds.",
   },
   {
     number: "02",
     title: "Pick your username",
-    description: "Choose a permanent @username. That's the only thing anyone needs to pay you.",
+    description: "Choose a permanent username. That's the only thing anyone needs to pay you.",
   },
   {
     number: "03",
@@ -22,8 +21,7 @@ const STEPS = [
   {
     number: "04",
     title: "Send",
-    description:
-      "Enter an amount, confirm with your passcode or Face ID, done. The payment shows Complete, not \"pending.\"",
+    description: "Enter an amount, confirm with your passcode or Face ID, done. The payment shows Complete, not pending.",
   },
 ];
 
@@ -39,7 +37,7 @@ export function HowItWorksSection() {
           className="mx-auto mb-14 max-w-2xl text-center"
         >
           <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-            From sign-up to sent, in four steps.
+            Four steps. That&apos;s it.
           </h2>
         </motion.div>
 
@@ -51,10 +49,14 @@ export function HowItWorksSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
-              className="relative"
+              className="group relative"
             >
-              <span className="font-display text-4xl font-semibold text-primary/25">{step.number}</span>
-              <h3 className="mt-3 font-display text-lg font-semibold">{step.title}</h3>
+              <span className="font-display text-4xl font-semibold text-primary/25 transition-colors duration-300 group-hover:text-primary/50">
+                {step.number}
+              </span>
+              <h3 className="mt-3 font-display text-lg font-semibold transition-colors duration-300 group-hover:text-primary">
+                {step.title}
+              </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.description}</p>
               {i < STEPS.length - 1 && (
                 <div className="absolute right-[-1rem] top-4 hidden h-px w-8 bg-border lg:block" />

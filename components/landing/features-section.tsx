@@ -8,14 +8,12 @@ const FEATURES = [
   {
     icon: AtSign,
     title: "Pay by username",
-    description:
-      "Search a friend's @username and send. No copying 40-character wallet addresses, ever.",
+    description: "Search a friend's username and send. No copying long wallet addresses, ever.",
   },
   {
     icon: Timer,
     title: "Done in under a second",
-    description:
-      "Arc settles every payment with deterministic finality — no waiting, no confirmations to count.",
+    description: "Arc settles every payment with deterministic finality. No waiting, no confirmations to count.",
   },
   {
     icon: KeyRound,
@@ -36,11 +34,8 @@ export function FeaturesSection() {
         className="mx-auto mb-14 max-w-2xl text-center"
       >
         <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-          Everything about money, nothing about crypto.
+          Simple by design.
         </h2>
-        <p className="mt-4 text-lg text-muted-foreground">
-          Zendapp handles the blockchain part quietly, in the background, so you never have to.
-        </p>
       </motion.div>
 
       <div className="grid gap-5 md:grid-cols-3">
@@ -52,8 +47,8 @@ export function FeaturesSection() {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5, delay: i * 0.08 }}
           >
-            <Card className="h-full p-7">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Card className="group h-full p-7 transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/20 hover:shadow-elevated">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110">
                 <Icon className="h-5 w-5" />
               </span>
               <h3 className="mt-5 font-display text-lg font-semibold">{title}</h3>

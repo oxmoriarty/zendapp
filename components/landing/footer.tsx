@@ -13,7 +13,7 @@ const COLUMNS = [
     heading: "Account",
     links: [
       { label: "Log in", href: "/signup" },
-      { label: "Get started", href: "/signup" },
+      { label: "Get Started", href: "/signup" },
     ],
   },
   {
@@ -45,7 +45,10 @@ export function Footer() {
               <ul className="mt-4 space-y-3">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground">
+                    <Link
+                      href={link.href}
+                      className="text-sm text-muted-foreground transition-colors duration-200 hover:text-primary"
+                    >
                       {link.label}
                     </Link>
                   </li>
@@ -57,7 +60,7 @@ export function Footer() {
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 text-xs text-muted-foreground sm:flex-row">
           <p>© {new Date().getFullYear()} Zendapp. Built on Arc.</p>
-          <p>Currently on Arc Testnet — no real funds are moved yet.</p>
+          <p>Currently on Arc Testnet. No real funds are moved yet.</p>
         </div>
       </div>
     </footer>
